@@ -20,6 +20,7 @@ class Sapphire < Formula
   end
 
   test do
-    system "false"
+    assert_equal "homebrew", shell_output("#{bin}/sapphire -c 'echo homebrew'").chomp
+    system bin/"sapphire", "-c", "printf -v hello -- '%s'"
   end
 end
