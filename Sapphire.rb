@@ -12,13 +12,9 @@ class Sapphire < Formula
   # depends_on "cmake" => :build
 
   def install
-    bin.install "unsign_xcode"
-   end
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
-    # system "cmake", ".", *std_cmake_args
+      bin.install "Sapphire"
+    end
+    system "make", "install"    # system "cmake", ".", *std_cmake_args
   end
 
   test do
@@ -34,3 +30,4 @@ class Sapphire < Formula
     system "false"
   end
 end
+
