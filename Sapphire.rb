@@ -3,7 +3,7 @@ class Sapphire < Formula
   homepage "http://www.sapphirelang.info"
   url "http://www.github.com/suku260/Sapphire"
   version "0.5.1"
-  sha256 "afd3e590825ddf05ed613cb34bd001e3afef801b1caaeb8f49057a1e95513a3a"
+  sha256 "62411ceb7a6720fbb006bfe0c8e13111e5d0872940439cbc7840d017b9778115"
   
   license "bsd"
 
