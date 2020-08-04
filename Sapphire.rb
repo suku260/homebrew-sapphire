@@ -1,7 +1,7 @@
 class Sapphire < Formula
   desc ""
   homepage ""
-  url "http://www.github.com/suku260:Sapphire"
+  url "http://www.github.com/suku260"
   sha256 ""
   license "bsd"
 
