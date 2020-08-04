@@ -8,6 +8,7 @@ class Sapphire < Formula
   # depends_on "cmake" => :build
 
   def install
+    bin.install "Sapphire"
     # ENV.deparallelize
     system "./configure", "--disable-debug",
                           "--disable-dependency-tracking",
