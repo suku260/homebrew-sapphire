@@ -1,7 +1,7 @@
 from sly import Lexer
 from sly import Parser
 class BasicLexer(Lexer): 
-	tokens = { NAME, NUMBER, STRING,WHILE,ID, IF, ELSE, FOR, EQ, LT, LE, GT, GE, NE, ARRAY } 
+	tokens = { NAME, NUMBER, STRING,WHILE,ID, IF, ELSE, IMPORT ,RPAREN , LPAREN ,RBRACE ,LBRACE ,FOR, EQ, LT, LE, GT, GE, NE, ARRAY } 
 	ignore = '\t '
 	literals = { '=', '+', '-', '/', '*', ',', ';','>','<','^','%','!'} 
 
@@ -14,6 +14,10 @@ class BasicLexer(Lexer):
 	LE      = r'<='
 	GE      = r'>='
 	NE      = r'!='
+	RPAREN= r'\)'
+	LPAREN= r'\('
+	RBRACE= r'\}'
+	LBRACE= r'\{'
 	# Number token 
 	@_(r'\d+') 
 	def NUMBER(self, t): 
@@ -25,6 +29,9 @@ class BasicLexer(Lexer):
 	ID['if'] = IF
 	ID['else'] = ELSE
 	ID['while'] = WHILE
+	ID['for'] = FOR
+	ID['import'] = IMPORT
+	ID['[]'] = ARRAY
 	#  get loops and more conditional bool shit from ply
 	# Comment token 
 	@_(r';.*') 
@@ -33,7 +40,12 @@ class BasicLexer(Lexer):
 	@_(r'//.*') 
 	def COMMENT(self, t): 
 		pass
-
+	@_(r'{.*') 
+	def nest(self, t): 
+		self.nesting_level = self.nesting_level+1
+	@_(r'}.*') 
+	def nest(self, t): 
+		self.nesting_level = self.nesting_level-1	
 	# Newline token(used only for showing 
 	# errors in new line) 
 	@_(r'\n+') 
@@ -61,6 +73,7 @@ class BasicParser(Parser):
 	def statement(self, p): 
 		return p.var_assign 
 
+	
 	@_('NAME "=" expr') 
 	def var_assign(self, p): 
 		return ('var_assign', p.NAME, p.expr) 
@@ -120,11 +133,12 @@ class BasicExecute:
 	def __init__(self, tree, env): 
 		self.env = env 
 		self.nesting_level=0
-		result = self.walkTree(tree) 
+		result = self.walkTree(tree)
+
 		if result is not None and isinstance(result, int): 
 			print(result) 
 		if isinstance(result, str) and result[0] == '"': 
-			print(result.replace('"','')) 
+			print(result.replace('"',''))
 
 	def walkTree(self, node): 
 
@@ -184,8 +198,11 @@ class BasicExecute:
 		if node[0] == 'var': 
 			try: 
 				return self.env[node[1]] 
-			except LookupError: 
-				print("Undefined variable "+node[1]) 
+			except LookupError:
+				if 'exit' == node[1]:
+					exit(1)
+				else: 
+					print("Undefined variable "+node[1]) 
 				return "\n"
 if __name__ == '__main__':
 	lexer = BasicLexer() 
