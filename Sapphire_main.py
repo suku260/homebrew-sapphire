@@ -1,7 +1,7 @@
 from sly import Lexer
 from sly import Parser
 class BasicLexer(Lexer): 
-	tokens = { NAME, NUMBER, STRING,WHILE,ID, IF, ELSE, IMPORT ,RPAREN , LPAREN ,RBRACE ,LBRACE ,FOR, EQ, LT, LE, GT, GE, NE, ARRAY } 
+	tokens = { NAME, NUMBER, SEP, STRING,WHILE,ID, IF, ELSE, IMPORT ,RPAREN ,LBRACK,RBRACK, LPAREN ,RBRACE ,LBRACE ,FOR, EQ, LE, GE, NE, ARRAY } 
 	ignore = '\t '
 	literals = { '=', '+', '-', '/', '*', ',', ';','>','<','^','%','!'} 
 
@@ -14,10 +14,13 @@ class BasicLexer(Lexer):
 	LE      = r'<='
 	GE      = r'>='
 	NE      = r'!='
+	SEP     = r','
 	RPAREN= r'\)'
 	LPAREN= r'\('
 	RBRACE= r'\}'
 	LBRACE= r'\{'
+	RBRACK= r'\]'
+	LBRACK= r'\['
 	# Number token 
 	@_(r'\d+') 
 	def NUMBER(self, t): 
@@ -116,6 +119,10 @@ class BasicParser(Parser):
 	@_('expr "/" expr') 
 	def expr(self, p): 
 		return ('div', p.expr0, p.expr1) 
+	@_('NAME "=" LBRACK expr RBRACK') 
+	def expr(self, p): 
+		print("array")
+		return ('array',p.NAME,p.expr) 
 
 	@_('"-" expr %prec UMINUS') 
 	def expr(self, p): 
@@ -193,8 +200,15 @@ class BasicExecute:
 
 		if node[0] == 'var_assign': 
 			self.env[node[1]] = self.walkTree(node[2]) 
-			return node[1] 
-
+			return (node[1]) 
+		if node[0] == 'array': 
+			try:
+				self.env[node[1]] = str(self.walkTree(node[2])).split(SEP) 
+			except:
+				self.env[node[1]] = self.walkTree(node[2])
+			finally:
+				print("Module error: 001")
+			return (node[1]) 
 		if node[0] == 'var': 
 			try: 
 				return self.env[node[1]] 
