@@ -1,15 +1,20 @@
 from sly import Lexer
 from sly import Parser
 class BasicLexer(Lexer): 
-	tokens = { NAME, NUMBER, SEP, STRING,WHILE,ID, IF, ELSE ,RPAREN ,LBRACK,RBRACK, LPAREN ,RBRACE ,LBRACE ,FOR, EQ, LE, GE, NE, ARRAY } 
+	tokens = { NAME, NUMBER, CLASS, PROCESS, SEP, MAIN, STRING,WHILE,ID, BUILD, RETURN, IF, ELSE ,RPAREN ,LBRACK,RBRACK, LPAREN ,RBRACE ,LBRACE ,FOR, EQ, LE, GE, NE, ARRAY } 
 	ignore = '\t '
-	literals = { '=', '+', '-', '/', '*', ',', ';','>','<','^','%','!',','} 
+	literals = { '=', '+', '-', '/', '*', ',', ';','>','<','^','%','!',',','(',')','[',']','{','}'} 
 
 
 	# Define tokens as regular expressions 
 	# (stored as raw strings) 
 	NAME = r'[a-zA-Z_][a-zA-Z0-9_]*'
 	STRING = r'\".*?\"'
+	CLASS = r'class'
+	BUILD= r'build'
+	PROCESS = r'process'
+	MAIN = r'process main'
+	RETURN = r'return'
 	EQ      = r'=='
 	LE      = r'<='
 	GE      = r'>='
@@ -28,12 +33,40 @@ class BasicLexer(Lexer):
 		# convert it into a python integer 
 		t.value = int(t.value) 
 		return t 
+	@_('process NAME "(expr){expr};" ') 
+	def statement(self, p): 
+		print(str(p.NAME,p.expr0,p.expr1))
+		return ('process',p.NAME,p.expr0,p.expr1) 
+	@_('class NAME "(expr){expr};" ') 
+	def statement(self, p): 
+		print(str(p.NAME,p.expr0,p.expr1))
+		return ('class',p.NAME,p.expr0,p.expr1) 
+	@_('BUILD NAME "(expr){expr};" ') 
+	def statement(self, p): 
+		print(str(p.NAME,p.expr0,p.expr1))
+		return ('build',p.NAME,p.expr0,p.expr1) 
+	@_('  IF"(expr){expr};" ') 
+	def statement(self, p): 
+		return ('ifloop',p.expr0,p.expr1) 
+	@_('  WHILE"(expr){expr};" ') 
+	def statement(self, p): 
+		return ('whileloop',p.expr0,p.expr1) 
+	@_('  FOR"(expr){expr};" ') 
+	def statement(self, p): 
+		return ('forloop',p.expr0,p.expr1) 
+	@_('  RETURN"(expr);" ') 
+	def statement(self, p): 
+		return ('return',p.expr0) 
+	@_('  NAME "=[expr];" ') 
+	def statement(self, p): 
+		return ('array',p.NAME, p.expr0) 
+
+	
 	ID = r'[a-zA-Z_][a-zA-Z0-9_]*'
 	ID['if'] = IF
 	ID['else'] = ELSE
 	ID['while'] = WHILE
 	ID['for'] = FOR
-	ID['[]'] = ARRAY
 
 	@_(r';.*') 
 	def EOL(self, t): 
@@ -139,7 +172,7 @@ class BasicParser(Parser):
 	@_('NAME') 
 	def expr(self, p): 
 		return ('var', p.NAME) 
-	
+
 	@_('NUMBER') 
 	def expr(self, p): 
 		return ('num', p.NUMBER)
