@@ -6,3 +6,18 @@ Developed by Jay Kumar
 tehkensei@gmail.com
 under development v0.5.2
 
+## Example Code
+```
+class classname(param)
+{
+  
+  build methodname(params)
+  {
+    
+  };
+};
+process main(){
+  class newinst. = new class();
+  newinst.run()
+};
+
