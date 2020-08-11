@@ -5,6 +5,8 @@ Developed by Jay Kumar
 
 tehkensei@gmail.com
 
+Support the project: https://ko-fi.com/sapphireprogramminglanguage
+
 under development v0.5.2
 
 ## Example Code
