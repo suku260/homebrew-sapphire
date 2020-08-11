@@ -1,9 +1,9 @@
 from sly import Lexer
 from sly import Parser
 class BasicLexer(Lexer): 
-	tokens = { NAME, NUMBER, SEP, STRING,WHILE,ID, IF, ELSE, IMPORT ,RPAREN ,LBRACK,RBRACK, LPAREN ,RBRACE ,LBRACE ,FOR, EQ, LE, GE, NE, ARRAY } 
+	tokens = { NAME, NUMBER, SEP, STRING,WHILE,ID, IF, ELSE ,RPAREN ,LBRACK,RBRACK, LPAREN ,RBRACE ,LBRACE ,FOR, EQ, LE, GE, NE, ARRAY } 
 	ignore = '\t '
-	literals = { '=', '+', '-', '/', '*', ',', ';','>','<','^','%','!'} 
+	literals = { '=', '+', '-', '/', '*', ',', ';','>','<','^','%','!',','} 
 
 
 	# Define tokens as regular expressions 
@@ -14,13 +14,13 @@ class BasicLexer(Lexer):
 	LE      = r'<='
 	GE      = r'>='
 	NE      = r'!='
-	SEP     = r','
 	RPAREN= r'\)'
 	LPAREN= r'\('
 	RBRACE= r'\}'
 	LBRACE= r'\{'
 	RBRACK= r'\]'
 	LBRACK= r'\['
+	SEP= r','
 	# Number token 
 	@_(r'\d+') 
 	def NUMBER(self, t): 
@@ -33,22 +33,27 @@ class BasicLexer(Lexer):
 	ID['else'] = ELSE
 	ID['while'] = WHILE
 	ID['for'] = FOR
-	ID['import'] = IMPORT
 	ID['[]'] = ARRAY
-	#  get loops and more conditional bool shit from ply
-	# Comment token 
+
 	@_(r';.*') 
 	def EOL(self, t): 
+		pass
+	@_(r',.*') 
+	def comma(self, t): 
 		pass
 	@_(r'//.*') 
 	def COMMENT(self, t): 
 		pass
 	@_(r'{.*') 
 	def nest(self, t): 
+		t.type = '{'
 		self.nesting_level = self.nesting_level+1
+		return t
 	@_(r'}.*') 
 	def nest(self, t): 
+		t.type = '}'
 		self.nesting_level = self.nesting_level-1	
+		return t
 	# Newline token(used only for showing 
 	# errors in new line) 
 	@_(r'\n+') 
@@ -121,8 +126,11 @@ class BasicParser(Parser):
 		return ('div', p.expr0, p.expr1) 
 	@_('NAME "=" LBRACK expr RBRACK') 
 	def expr(self, p): 
-		print("array")
-		return ('array',p.NAME,p.expr) 
+		exp=str(p.expr).split(',')
+		for a in exp:
+			print(a)
+
+		return ('var_assign',p.NAME,p.expr) 
 
 	@_('"-" expr %prec UMINUS') 
 	def expr(self, p): 
@@ -131,7 +139,7 @@ class BasicParser(Parser):
 	@_('NAME') 
 	def expr(self, p): 
 		return ('var', p.NAME) 
-
+	
 	@_('NUMBER') 
 	def expr(self, p): 
 		return ('num', p.NUMBER)
@@ -144,6 +152,7 @@ class BasicExecute:
 
 		if result is not None and isinstance(result, int): 
 			print(result) 
+
 		if isinstance(result, str) and result[0] == '"': 
 			print(result.replace('"',''))
 
@@ -164,8 +173,7 @@ class BasicExecute:
 				self.walkTree(node[2]) 
 
 		if node[0] == 'num': 
-			return node[1] 
-
+			return node[1]
 		if node[0] == 'str': 
 			return node[1]
 		if node[0] == 'boolgreater': 
@@ -199,16 +207,13 @@ class BasicExecute:
 			return answer
 
 		if node[0] == 'var_assign': 
-			self.env[node[1]] = self.walkTree(node[2]) 
-			return (node[1]) 
-		if node[0] == 'array': 
-			try:
-				self.env[node[1]] = str(self.walkTree(node[2])).split(SEP) 
-			except:
-				self.env[node[1]] = self.walkTree(node[2])
-			finally:
-				print("Module error: 001")
-			return (node[1]) 
+			if ',' not in str(self.walkTree(node[2])): 
+				self.env[node[1]] = self.walkTree(node[2]) 
+			else:
+				self.env[node[1]] = str(self.walkTree(node[2])).split(',')
+
+
+			return (node[1])  
 		if node[0] == 'var': 
 			try: 
 				return self.env[node[1]] 
@@ -221,7 +226,6 @@ class BasicExecute:
 if __name__ == '__main__':
 	lexer = BasicLexer() 
 	parser = BasicParser() 
-	print('Sapphire language is running, but under development') 
 	env = {} 
 	
 	while True: 
@@ -233,6 +237,7 @@ if __name__ == '__main__':
 				text=text+text2
 		
 		except EOFError: 
+			print("EOF error")
 			break
 		
 		if text: 
