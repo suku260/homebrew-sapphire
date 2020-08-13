@@ -1,7 +1,7 @@
 from sly import Lexer
 from sly import Parser
 class BasicLexer(Lexer): 
-	tokens = { NAME, NUMBER, CLASS, PROCESS, SEP, MAIN, STRING,WHILE,ID, BUILD, RETURN, IF, ELSE ,RPAREN ,LBRACK,RBRACK, LPAREN ,RBRACE ,LBRACE ,FOR, EQ, LE, GE, NE, ARRAY } 
+	tokens = { NAME, NUMBER, OBJECT, PROCESS, SEP, MAIN, STRING, WHILE, ID, BUILD, RETURN, IF, ELSE ,RPAREN ,LBRACK,RBRACK, LPAREN ,RBRACE ,LBRACE ,FOR, EQ, LE, GE, NE, ARRAY } 
 	ignore = '\t '
 	literals = { '=', '+', '-', '/', '*', ',', ';','>','<','^','%','!',',','(',')','[',']','{','}'} 
 
@@ -10,11 +10,14 @@ class BasicLexer(Lexer):
 	# (stored as raw strings) 
 	NAME = r'[a-zA-Z_][a-zA-Z0-9_]*'
 	STRING = r'\".*?\"'
-	CLASS = r'class'
+	OBJECT = r'object'
 	BUILD= r'build'
 	PROCESS = r'process'
 	MAIN = r'process main'
 	RETURN = r'return'
+	IF = r'if'
+	WHILE = r'while'
+	FOR = r'for'
 	EQ      = r'=='
 	LE      = r'<='
 	GE      = r'>='
@@ -33,33 +36,31 @@ class BasicLexer(Lexer):
 		# convert it into a python integer 
 		t.value = int(t.value) 
 		return t 
-	@_('process NAME "(expr){expr};" ') 
-	def statement(self, p): 
-		print(str(p.NAME,p.expr0,p.expr1))
+	@_('PROCESS NAME "(expr){expr}" ') 
+	def process(self, p): 
+		
 		return ('process',p.NAME,p.expr0,p.expr1) 
-	@_('class NAME "(expr){expr};" ') 
-	def statement(self, p): 
-		print(str(p.NAME,p.expr0,p.expr1))
-		return ('class',p.NAME,p.expr0,p.expr1) 
-	@_('BUILD NAME "(expr){expr};" ') 
-	def statement(self, p): 
-		print(str(p.NAME,p.expr0,p.expr1))
+	@_('OBJECT NAME "(expr){expr}" ') 
+	def object(self, p): 
+		return ('object',p.NAME,p.expr0,p.expr1) 
+	@_('BUILD NAME "(expr){expr}" ') 
+	def build(self, p): 
 		return ('build',p.NAME,p.expr0,p.expr1) 
-	@_('  IF"(expr){expr};" ') 
-	def statement(self, p): 
+	@_('IF"(expr){expr}" ') 
+	def ifloops(self, p): 
 		return ('ifloop',p.expr0,p.expr1) 
-	@_('  WHILE"(expr){expr};" ') 
-	def statement(self, p): 
+	@_('WHILE"(expr){expr}" ') 
+	def whileloops(self, p): 
 		return ('whileloop',p.expr0,p.expr1) 
-	@_('  FOR"(expr){expr};" ') 
-	def statement(self, p): 
+	@_(' FOR"(expr){expr}" ') 
+	def forloops(self, p): 
 		return ('forloop',p.expr0,p.expr1) 
-	@_('  RETURN"(expr);" ') 
-	def statement(self, p): 
-		return ('return',p.expr0) 
-	@_('  NAME "=[expr];" ') 
-	def statement(self, p): 
-		return ('array',p.NAME, p.expr0) 
+	@_('  RETURN"(expr)" ') 
+	def returnstmt(self, p): 
+		return ('return',p.expr) 
+	@_('  NAME "=[expr]" ') 
+	def array(self, p): 
+		return ('array',p.NAME, p.expr) 
 
 	
 	ID = r'[a-zA-Z_][a-zA-Z0-9_]*'
@@ -112,12 +113,28 @@ class BasicParser(Parser):
 	
 	@_('var_assign') 
 	def statement(self, p): 
-		return p.var_assign 
+		if p.NAME not in tokens and : 
+			return ('var_assign', p.NAME, p.expr) 
+		elif str(p.NAME)[0].isdigit()== False and str(p.NAME)[0] not in ['!','@','$','%','^','&','*','(',')','_','+','=','\\','/','<','>','[',']','.']:
+			print("Cannot use a number or symbol as a variable name")
+			break
+		else:
+
+			print("Cannot use a keyword as a variable name")
+			break
 
 	
 	@_('NAME "=" expr') 
-	def var_assign(self, p): 
-		return ('var_assign', p.NAME, p.expr) 
+	def var_assign(self, p):
+		if p.NAME not in tokens and : 
+			return ('var_assign', p.NAME, p.expr) 
+		elif str(p.NAME)[0].isdigit()== False and str(p.NAME)[0] not in ['!','@','$','%','^','&','*','(',')','_','+','=','\\','/','<','>','[',']','.']:
+			print("Cannot use a number or symbol as a variable name")
+			break
+		else:
+
+			print("Cannot use a keyword as a variable name")
+			break
 
 	@_('NAME "=" STRING') 
 	def var_assign(self, p): 
