@@ -1,15 +1,23 @@
 from sly import Lexer
 from sly import Parser
 class BasicLexer(Lexer): 
-	tokens = { NAME, NUMBER, STRING,WHILE,ID, IF, ELSE, IMPORT ,RPAREN , LPAREN ,RBRACE ,LBRACE ,FOR, EQ, LT, LE, GT, GE, NE, ARRAY } 
+	tokens = { NAME, NUMBER, OBJECT, PROCESS, SEP, MAIN, STRING, WHILE, ID, BUILD, RETURN, IF, ELSE ,RPAREN ,LBRACK,RBRACK, LPAREN ,RBRACE ,LBRACE ,FOR, EQ, LE, GE, NE, ARRAY } 
 	ignore = '\t '
-	literals = { '=', '+', '-', '/', '*', ',', ';','>','<','^','%','!'} 
+	literals = { '=', '+', '-', '/', '*', ',', ';','>','<','^','%','!',',','(',')','[',']','{','}'} 
 
 
 	# Define tokens as regular expressions 
 	# (stored as raw strings) 
 	NAME = r'[a-zA-Z_][a-zA-Z0-9_]*'
 	STRING = r'\".*?\"'
+	OBJECT = r'object'
+	BUILD= r'build'
+	PROCESS = r'process'
+	MAIN = r'process main'
+	RETURN = r'return'
+	IF = r'if'
+	WHILE = r'while'
+	FOR = r'for'
 	EQ      = r'=='
 	LE      = r'<='
 	GE      = r'>='
@@ -18,6 +26,9 @@ class BasicLexer(Lexer):
 	LPAREN= r'\('
 	RBRACE= r'\}'
 	LBRACE= r'\{'
+	RBRACK= r'\]'
+	LBRACK= r'\['
+	SEP= r','
 	# Number token 
 	@_(r'\d+') 
 	def NUMBER(self, t): 
@@ -25,27 +36,58 @@ class BasicLexer(Lexer):
 		# convert it into a python integer 
 		t.value = int(t.value) 
 		return t 
+	@_('PROCESS NAME "(expr){expr}" ') 
+	def process(self, p): 
+		
+		return ('process',p.NAME,p.expr0,p.expr1) 
+	@_('OBJECT NAME "(expr){expr}" ') 
+	def object(self, p): 
+		return ('object',p.NAME,p.expr0,p.expr1) 
+	@_('BUILD NAME "(expr){expr}" ') 
+	def build(self, p): 
+		return ('build',p.NAME,p.expr0,p.expr1) 
+	@_('IF"(expr){expr}" ') 
+	def ifloops(self, p): 
+		return ('ifloop',p.expr0,p.expr1) 
+	@_('WHILE"(expr){expr}" ') 
+	def whileloops(self, p): 
+		return ('whileloop',p.expr0,p.expr1) 
+	@_(' FOR"(expr){expr}" ') 
+	def forloops(self, p): 
+		return ('forloop',p.expr0,p.expr1) 
+	@_('  RETURN"(expr)" ') 
+	def returnstmt(self, p): 
+		return ('return',p.expr) 
+	@_('  NAME "=[expr]" ') 
+	def array(self, p): 
+		return ('array',p.NAME, p.expr) 
+
+	
 	ID = r'[a-zA-Z_][a-zA-Z0-9_]*'
 	ID['if'] = IF
 	ID['else'] = ELSE
 	ID['while'] = WHILE
 	ID['for'] = FOR
-	ID['import'] = IMPORT
-	ID['[]'] = ARRAY
-	#  get loops and more conditional bool shit from ply
-	# Comment token 
+
 	@_(r';.*') 
 	def EOL(self, t): 
+		pass
+	@_(r',.*') 
+	def comma(self, t): 
 		pass
 	@_(r'//.*') 
 	def COMMENT(self, t): 
 		pass
 	@_(r'{.*') 
 	def nest(self, t): 
+		t.type = '{'
 		self.nesting_level = self.nesting_level+1
+		return t
 	@_(r'}.*') 
 	def nest(self, t): 
+		t.type = '}'
 		self.nesting_level = self.nesting_level-1	
+		return t
 	# Newline token(used only for showing 
 	# errors in new line) 
 	@_(r'\n+') 
@@ -71,12 +113,28 @@ class BasicParser(Parser):
 	
 	@_('var_assign') 
 	def statement(self, p): 
-		return p.var_assign 
+		if p.NAME not in tokens and : 
+			return ('var_assign', p.NAME, p.expr) 
+		elif str(p.NAME)[0].isdigit()== False and str(p.NAME)[0] not in ['!','@','$','%','^','&','*','(',')','_','+','=','\\','/','<','>','[',']','.']:
+			print("Cannot use a number or symbol as a variable name")
+			break
+		else:
+
+			print("Cannot use a keyword as a variable name")
+			break
 
 	
 	@_('NAME "=" expr') 
-	def var_assign(self, p): 
-		return ('var_assign', p.NAME, p.expr) 
+	def var_assign(self, p):
+		if p.NAME not in tokens and : 
+			return ('var_assign', p.NAME, p.expr) 
+		elif str(p.NAME)[0].isdigit()== False and str(p.NAME)[0] not in ['!','@','$','%','^','&','*','(',')','_','+','=','\\','/','<','>','[',']','.']:
+			print("Cannot use a number or symbol as a variable name")
+			break
+		else:
+
+			print("Cannot use a keyword as a variable name")
+			break
 
 	@_('NAME "=" STRING') 
 	def var_assign(self, p): 
@@ -116,6 +174,13 @@ class BasicParser(Parser):
 	@_('expr "/" expr') 
 	def expr(self, p): 
 		return ('div', p.expr0, p.expr1) 
+	@_('NAME "=" LBRACK expr RBRACK') 
+	def expr(self, p): 
+		exp=str(p.expr).split(',')
+		for a in exp:
+			print(a)
+
+		return ('var_assign',p.NAME,p.expr) 
 
 	@_('"-" expr %prec UMINUS') 
 	def expr(self, p): 
@@ -137,6 +202,7 @@ class BasicExecute:
 
 		if result is not None and isinstance(result, int): 
 			print(result) 
+
 		if isinstance(result, str) and result[0] == '"': 
 			print(result.replace('"',''))
 
@@ -157,8 +223,7 @@ class BasicExecute:
 				self.walkTree(node[2]) 
 
 		if node[0] == 'num': 
-			return node[1] 
-
+			return node[1]
 		if node[0] == 'str': 
 			return node[1]
 		if node[0] == 'boolgreater': 
@@ -192,9 +257,13 @@ class BasicExecute:
 			return answer
 
 		if node[0] == 'var_assign': 
-			self.env[node[1]] = self.walkTree(node[2]) 
-			return node[1] 
+			if ',' not in str(self.walkTree(node[2])): 
+				self.env[node[1]] = self.walkTree(node[2]) 
+			else:
+				self.env[node[1]] = str(self.walkTree(node[2])).split(',')
 
+
+			return (node[1])  
 		if node[0] == 'var': 
 			try: 
 				return self.env[node[1]] 
@@ -207,7 +276,6 @@ class BasicExecute:
 if __name__ == '__main__':
 	lexer = BasicLexer() 
 	parser = BasicParser() 
-	print('Sapphire language is running, but under development') 
 	env = {} 
 	
 	while True: 
@@ -219,6 +287,7 @@ if __name__ == '__main__':
 				text=text+text2
 		
 		except EOFError: 
+			print("EOF error")
 			break
 		
 		if text: 
