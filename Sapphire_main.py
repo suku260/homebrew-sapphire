@@ -1,7 +1,7 @@
 from sly import Lexer
 from sly import Parser
 class BasicLexer(Lexer): 
-	tokens = { NAME, NUMBER, OBJECT, PROCESS, SEP, MAIN, STRING, WHILE, ID, BUILD, RETURN, IF, ELSE ,RPAREN ,LBRACK,RBRACK, LPAREN ,RBRACE ,LBRACE ,FOR, EQ, LE, GE, NE, ARRAY } 
+	tokens = { NAME, NUMBER, CLASS, PROCESS, SEP, MAIN, STRING, WHILE, ID, BUILD, RETURN, IF, ELSE ,RPAREN ,LBRACK,RBRACK, LPAREN ,RBRACE ,LBRACE ,FOR, EQ, LE, GE, NE, ARRAY } 
 	ignore = '\t '
 	literals = { '=', '+', '-', '/', '*', ',', ';','>','<','^','%','!',',','(',')','[',']','{','}'} 
 
@@ -10,14 +10,11 @@ class BasicLexer(Lexer):
 	# (stored as raw strings) 
 	NAME = r'[a-zA-Z_][a-zA-Z0-9_]*'
 	STRING = r'\".*?\"'
-	OBJECT = r'object'
+	CLASS = r'class'
 	BUILD= r'build'
 	PROCESS = r'process'
 	MAIN = r'process main'
 	RETURN = r'return'
-	IF = r'if'
-	WHILE = r'while'
-	FOR = r'for'
 	EQ      = r'=='
 	LE      = r'<='
 	GE      = r'>='
@@ -40,23 +37,23 @@ class BasicLexer(Lexer):
 	def process(self, p): 
 		
 		return ('process',p.NAME,p.expr0,p.expr1) 
-	@_('OBJECT NAME "(expr){expr}" ') 
-	def object(self, p): 
-		return ('object',p.NAME,p.expr0,p.expr1) 
-	@_('BUILD NAME "(expr){expr}" ') 
-	def build(self, p): 
+	@_('CLASS NAME "(expr){expr}" ') 
+	def objects(self, p): 
+		return ('class',p.NAME,p.expr0,p.expr1) 
+	@_('BUILD NAME "(expr){ expr}" ') 
+	def builds(self, p): 
 		return ('build',p.NAME,p.expr0,p.expr1) 
-	@_('IF"(expr){expr}" ') 
+	@_('IF LPAREN"expr" RPAREN LBRACE "expr" RBRACE ') 
 	def ifloops(self, p): 
 		return ('ifloop',p.expr0,p.expr1) 
-	@_('WHILE"(expr){expr}" ') 
+	@_('  WHILE"(expr){ expr}" ') 
 	def whileloops(self, p): 
 		return ('whileloop',p.expr0,p.expr1) 
-	@_(' FOR"(expr){expr}" ') 
+	@_('  FOR"(expr){ expr}" ') 
 	def forloops(self, p): 
 		return ('forloop',p.expr0,p.expr1) 
 	@_('  RETURN"(expr)" ') 
-	def returnstmt(self, p): 
+	def returns(self, p): 
 		return ('return',p.expr) 
 	@_('  NAME "=[expr]" ') 
 	def array(self, p): 
@@ -113,28 +110,12 @@ class BasicParser(Parser):
 	
 	@_('var_assign') 
 	def statement(self, p): 
-		if p.NAME not in tokens and : 
-			return ('var_assign', p.NAME, p.expr) 
-		elif str(p.NAME)[0].isdigit()== False and str(p.NAME)[0] not in ['!','@','$','%','^','&','*','(',')','_','+','=','\\','/','<','>','[',']','.']:
-			print("Cannot use a number or symbol as a variable name")
-			break
-		else:
-
-			print("Cannot use a keyword as a variable name")
-			break
+		return p.var_assign 
 
 	
 	@_('NAME "=" expr') 
-	def var_assign(self, p):
-		if p.NAME not in tokens and : 
-			return ('var_assign', p.NAME, p.expr) 
-		elif str(p.NAME)[0].isdigit()== False and str(p.NAME)[0] not in ['!','@','$','%','^','&','*','(',')','_','+','=','\\','/','<','>','[',']','.']:
-			print("Cannot use a number or symbol as a variable name")
-			break
-		else:
-
-			print("Cannot use a keyword as a variable name")
-			break
+	def var_assign(self, p): 
+		return ('var_assign', p.NAME, p.expr) 
 
 	@_('NAME "=" STRING') 
 	def var_assign(self, p): 
@@ -263,7 +244,13 @@ class BasicExecute:
 				self.env[node[1]] = str(self.walkTree(node[2])).split(',')
 
 
-			return (node[1])  
+			return (node[1]) 
+		if node[0] == 'ifloop': 
+			return("if("+node[1]+") \n {"+node[2]+"}; is being processed soon")
+		if node[0] == 'forloop': 
+			return("for("+node[1]+") {"+node[2]+"}; is being processed soon")
+		if node[0] == 'whileloop': 
+			return("while("+node[1]+") {"+node[2]+"}; is being processed soon")
 		if node[0] == 'var': 
 			try: 
 				return self.env[node[1]] 
