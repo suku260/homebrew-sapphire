@@ -214,8 +214,28 @@ class BasicExecute:
 				return True
 			else:
 				return False
+		if node[0] == 'boolgreaterequal': 
+			if int(self.walkTree(node[1])) >= int(self.walkTree(node[2])): 
+				return True
+			else:
+				return False
 		if node[0] == 'boolless': 
 			if int(self.walkTree(node[1])) < int(self.walkTree(node[2])): 
+				return True
+			else:
+				return False
+		if node[0] == 'boollessequal': 
+			if int(self.walkTree(node[1])) <= int(self.walkTree(node[2])): 
+				return True
+			else:
+				return False
+		if node[0] == 'boolequal': 
+			if int(self.walkTree(node[1])) == int(self.walkTree(node[2])): 
+				return True
+			else:
+				return False
+		if node[0] == 'boolnotequal': 
+			if int(self.walkTree(node[1])) != int(self.walkTree(node[2])): 
 				return True
 			else:
 				return False
