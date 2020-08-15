@@ -1,7 +1,7 @@
 from sly import Lexer
 from sly import Parser
 class BasicLexer(Lexer): 
-	tokens = { NAME, NUMBER, OBJECT, PROCESS, STRING, WHILE, BUILD, RETURN, IF, ELSE ,RPAREN ,LBRACK,RBRACK, LPAREN ,RBRACE ,LBRACE ,FOR, EQ, LE, GE, NE, ARRAY } 
+	tokens = { NAME, NUMBER, OBJECT, OR, AND, PROCESS, STRING, WHILE, BUILD, RETURN, IF, ELSE ,RPAREN ,LBRACK,RBRACK, LPAREN ,RBRACE ,LBRACE ,FOR, EQ, LE, GE, NE, ARRAY } 
 	ignore = '\t '
 	literals = { '=', '+', '-', '/', '*', ',', ';','>','<','^','%','!',',','(',')','[',']','{','}'} 
 
@@ -20,6 +20,8 @@ class BasicLexer(Lexer):
 	NE      = r'!='
 	RPAREN= r'\)'
 	LPAREN= r'\('
+	OR=r'or'
+	AND = r'and'
 	RBRACE= r'\}'
 	LBRACE= r'\{'
 	RBRACK= r'\]'
@@ -76,7 +78,17 @@ class BasicParser(Parser):
 	@_('') 
 	def statement(self, p): 
 		pass
-	
+	@_('and_expr','or_expr')
+	def expr(self, p):
+		return p[0]
+
+	@_('expr OR expr')
+	def or_expr(self, p):
+		return ('OR', p.expr0, p.expr1)
+
+	@_('expr AND expr')
+	def and_expr(self, p):
+		return ('AND', p.expr0, p.expr1)
 	@_('var_assign') 
 	def statement(self, p): 
 		return p.var_assign 
@@ -267,6 +279,10 @@ class BasicExecute:
 
 
 			return (node[1]) 
+		if node[0] == 'OR': 
+			return node[1]
+		if node[0] == 'AND': 
+			return node[1]
 		if node[0] == 'ifloop': 
 			return("if("+node[1]+") \n {"+node[2]+"}; is being processed soon")
 		if node[0] == 'forloop': 
