@@ -1,16 +1,25 @@
 
+
 import sys
 sys.path.insert(0, "../..")
 
 tokens = (
-    'NAME', 'NUMBER',
+    'NAME', 'STRING','NUMBER','LE','GE','EQ','NE','G','L'
 )
 
-literals = ['=', '+', '-', '*', '/', '(', ')','^','%']
+literals = ['=', '+', '-', '*', '/', '(', ')','^','%','[',']','{','}',';']
 
 # Tokens
+t_LE=r'<='
+t_GE=r'>='
+t_EQ=r'=='
+t_NE=r'!='
+t_G=r'>'
+t_L=r'<'
+
 
 t_NAME = r'[a-zA-Z_][a-zA-Z0-9_]*'
+t_STRING = r'\".*?\"'
 
 
 def t_NUMBER(t):
@@ -37,6 +46,7 @@ lexer = lex.lex()
 precedence = (
     ('left', '+', '-'),
     ('left', '*', '/'),
+    ('left', '^', '%')
     ('right', 'UMINUS'),
 )
 
@@ -50,9 +60,36 @@ def p_statement_assign(p):
 
 def p_statement_expr(p):
     'statement : expression'
-    print(p[1])
+    if p[1] != None:
+    	print(p[1])
 
-
+def p_bool_cond(p):
+	'''expression : expression L expression
+                  | expression G expression
+                  | expression GE expression
+                  | expression LE expression
+                  | expression EQ expression
+                  | expression NE expression'''
+	boolean=False
+	if p[2] == '>':
+		if p[1] > p[3]:
+			boolean=True
+	elif p[2] == '<':
+		if p[1] < p[3]:
+			boolean=True
+	elif p[2] == '>=':
+		if p[1] >= p[3]:
+			boolean=True
+	elif p[2] == '<=':
+		if p[1] <= p[3]:
+			boolean=True
+	elif p[2] == '==':
+		if p[1] == p[3]:
+			boolean=True
+	elif p[2] == '!=':
+		if p[1] != p[3]:
+			boolean=True
+	print(boolean)
 def p_expression_binop(p):
     '''expression : expression '+' expression
                   | expression '-' expression
@@ -72,6 +109,7 @@ def p_expression_binop(p):
         p[0] = p[1] ** p[3]
     elif p[2] == '%':
         p[0] = p[1] % p[3]
+    
 
 
 def p_expression_uminus(p):
@@ -94,8 +132,7 @@ def p_expression_name(p):
     try:
         p[0] = names[p[1]]
     except LookupError:
-        print("Undefined name '%s'" % p[1])
-        p[0] = 0
+        p[0] = f'undefined variable {p[1]} not found'
 
 
 def p_error(p):
@@ -112,6 +149,7 @@ while True:
         s = input('Sapphire:> ')
         if s=='exit':
         	exit(1)
+
 
     except EOFError:
         break
