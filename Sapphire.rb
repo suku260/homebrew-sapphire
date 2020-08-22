@@ -1,8 +1,10 @@
 class Sapphire < Formula
   desc ""
-  homepage ""
-  url "http://www.github.com/suku260"
-  sha256 "afd3e590825ddf05ed613cb34bd001e3afef801b1caaeb8f49057a1e95513a3a"
+  homepage "http://www.sapphirelang.info"
+  url "http://www.github.com/suku260/Sapphire"
+  version "0.5.1"
+  sha256 "62411ceb7a6720fbb006bfe0c8e13111e5d0872940439cbc7840d017b9778115"
+  
   license "bsd"
 
   # depends_on "cmake" => :build
@@ -19,6 +21,7 @@ class Sapphire < Formula
   end
 
   test do
-    system "false"
+    assert_equal "homebrew", shell_output("#{bin}/sapphire -c 'echo homebrew'").chomp
+    system bin/"sapphire", "-c", "printf -v hello -- '%s'"
   end
 end
