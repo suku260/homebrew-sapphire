@@ -3,7 +3,7 @@ import sys
 sys.path.insert(0, "../..")
 
 tokens = (
-    'NAME', 'STRING','NUMBER','LE','GE','EQ','NE','G','L'
+    'NAME', 'STRING','NUMBER','LE','GE','EQ','NE','G','L','ARRAY'
 )
 
 literals = ['=', '+', '-', '*', '/', '(', ')','^','%','[',']','{','}',';']
@@ -18,13 +18,14 @@ t_L=r'<'
 
 
 t_NAME = r'[a-zA-Z_][a-zA-Z0-9_]*'
-t_STRING = r'\".*?\"'
-
+t_STRING = r'"[a-zA-Z_][a-zA-Z_0-9]*"' 
 
 def t_NUMBER(t):
     r'\d+'
     t.value = int(t.value)
     return t
+def t_ARRAY(t):
+	
 
 t_ignore = " \t"
 
@@ -45,7 +46,7 @@ lexer = lex.lex()
 precedence = (
     ('left', '+', '-'),
     ('left', '*', '/'),
-    ('left', '^', '%')
+    ('left', '^', '%'),
     ('right', 'UMINUS'),
 )
 
@@ -125,11 +126,18 @@ def p_expression_number(p):
     "expression : NUMBER"
     p[0] = p[1]
 
+def p_expression_string(p):
+    "expression : STRING"
+    p[0] = p[1]
+def p_expression_array(p):
+    "expression : ARRAY"
+    p[0] = p[1]
+
 
 def p_expression_name(p):
     "expression : NAME"
     try:
-        p[0] = names[p[1]]
+        p[0] = names[p[1]].replace('"','')
     except LookupError:
         p[0] = f'undefined variable {p[1]} not found'
 
