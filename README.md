@@ -17,10 +17,10 @@ class classname(param)
   build methodname(params)
   {
     
-  };
+  }
 };
 process main(){
-  class newinst. = new class();
-  newinst.run()
+  class newinstance = new class();
+  newinstance.run();
 };
 
