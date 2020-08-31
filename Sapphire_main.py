@@ -3,7 +3,7 @@ import sys
 sys.path.insert(0, "../..")
 
 tokens = (
-    'NAME','READ_FILE','IN','NOT','ARRAY','INPUT','STRING','CLASS','BUILD','FUNCTION','SEMI','AND','OR','NUMBER','LE','SEP','GE','EQ','NE','G','L','LBRACK','RBRACK','LPAREN','RPAREN','LBRACE','RBRACE','IF','WHILE','FOR'
+    'NAME','IN','NOT','ARRAY','INPUT','STRING','CLASS','BUILD','FUNCTION','SEMI','AND','OR','NUMBER','LE','SEP','GE','EQ','NE','G','L','LBRACK','RBRACK','LPAREN','RPAREN','LBRACE','RBRACE','IF','WHILE','FOR'
 )
 
 literals = ['=', '+','.','-', '*', '/', '(', ')','^','%',',','{','}']
@@ -25,7 +25,6 @@ t_FOR=r'for'
 t_IF=r'if'
 t_SEMI = r';'
 t_WHILE=r'while'
-t_READ_FILE=r'read'
 t_IN=r'in'
 t_NOT=r'not'
 t_LBRACK=r'\['
@@ -85,7 +84,7 @@ def p_statement_assign(p):
     'statement : NAME "=" expression'
     names[p[1]] = p[3]
 def p_input_assign(p):
-    'statement : NAME "=" INPUT LPAREN STRING RPAREN'
+    'statement : NAME "=" INPUT LPAREN expression RPAREN'
     x=input('\n')
     names[p[1]] = x
 def p_if_loop(p):
@@ -98,11 +97,165 @@ def p_for_loop(p):
 	'statement : FOR LPAREN expression RPAREN LBRACE expression RBRACE'
 	print(f" for {p[3]} is true then do {p[6]}")
 def p_conditional_and(p):
-    'statement : expression AND expression'
-    print('and')
+    '''statement : expression L expression AND expression L expression
+    			  | expression L expression AND expression G expression
+    			  | expression L expression AND expression GE expression
+    			  | expression L expression AND expression LE expression
+    			  | expression L expression AND expression EQ expression
+    			  | expression L expression AND expression NE expression
+                  | expression G expression AND expression L expression
+    			  | expression G expression AND expression G expression
+    			  | expression G expression AND expression GE expression
+    			  | expression G expression AND expression LE expression
+    			  | expression G expression AND expression EQ expression
+    			  | expression G expression AND expression NE expression
+    			  | expression GE expression AND expression L expression
+    			  | expression GE expression AND expression G expression
+    			  | expression GE expression AND expression GE expression
+    			  | expression GE expression AND expression LE expression
+    			  | expression GE expression AND expression EQ expression
+    			  | expression GE expression AND expression NE expression
+    			  | expression LE expression AND expression L expression
+    			  | expression LE expression AND expression G expression
+    			  | expression LE expression AND expression GE expression
+    			  | expression LE expression AND expression LE expression
+    			  | expression LE expression AND expression EQ expression
+    			  | expression LE expression AND expression NE expression
+    			  | expression EQ expression AND expression L expression
+    			  | expression EQ expression AND expression G expression
+    			  | expression EQ expression AND expression GE expression
+    			  | expression EQ expression AND expression LE expression
+    			  | expression EQ expression AND expression EQ expression
+    			  | expression EQ expression AND expression NE expression
+    			  | expression NE expression AND expression L expression
+    			  | expression NE expression AND expression G expression
+    			  | expression NE expression AND expression GE expression
+    			  | expression NE expression AND expression LE expression
+    			  | expression NE expression AND expression EQ expression
+    			  | expression NE expression AND expression NE expression'''
+    boolean=False
+    if p[2] == '>':
+    	if p[1] > p[3]:
+    		boolean=True
+    elif p[2] == '<':
+    	if p[1] < p[3]:
+    		boolean=True
+    elif p[2] == '>=':
+    	if p[1] >= p[3]:
+    		boolean=True
+    elif p[2] == '<=':
+    	if p[1] <= p[3]:
+    		boolean=True
+    elif p[2] == '==':
+    	if p[1] == p[3]:
+    		boolean=True
+    elif p[2] == '!=':
+    	if p[1] != p[3]:
+    		boolean=True
+    boolean2=False
+    if p[6] == '>':
+    	if p[5] > p[7]:
+    		boolean2=True
+    elif p[6] == '<':
+    	if p[5] < p[7]:
+    		boolean2=True
+    elif p[6] == '>=':
+    	if p[5] >= p[7]:
+    		boolean2=True
+    elif p[6] == '<=':
+    	if p[5] <= p[7]:
+    		boolean2=True
+    elif p[6] == '==':
+    	if p[5] == p[7]:
+    		boolean2=True
+    elif p[6] == '!=':
+    	if p[5] != p[7]:
+    		boolean2=True
+    if boolean==True and boolean2==True:
+    	p[0]=True
+    else:
+    	p[0]=False
+    print(p[0])
 def p_conditional_or(p):
-    'statement : expression OR expression'
-    print('or')
+    '''statement : expression L expression OR expression L expression
+    			  | expression L expression OR expression G expression
+    			  | expression L expression OR expression GE expression
+    			  | expression L expression OR expression LE expression
+    			  | expression L expression OR expression EQ expression
+    			  | expression L expression OR expression NE expression
+                  | expression G expression OR expression L expression
+    			  | expression G expression OR expression G expression
+    			  | expression G expression OR expression GE expression
+    			  | expression G expression OR expression LE expression
+    			  | expression G expression OR expression EQ expression
+    			  | expression G expression OR expression NE expression
+    			  | expression GE expression OR expression L expression
+    			  | expression GE expression OR expression G expression
+    			  | expression GE expression OR expression GE expression
+    			  | expression GE expression OR expression LE expression
+    			  | expression GE expression OR expression EQ expression
+    			  | expression GE expression OR expression NE expression
+    			  | expression LE expression OR expression L expression
+    			  | expression LE expression OR expression G expression
+    			  | expression LE expression OR expression GE expression
+    			  | expression LE expression OR expression LE expression
+    			  | expression LE expression OR expression EQ expression
+    			  | expression LE expression OR expression NE expression
+    			  | expression EQ expression OR expression L expression
+    			  | expression EQ expression OR expression G expression
+    			  | expression EQ expression OR expression GE expression
+    			  | expression EQ expression OR expression LE expression
+    			  | expression EQ expression OR expression EQ expression
+    			  | expression EQ expression OR expression NE expression
+    			  | expression NE expression OR expression L expression
+    			  | expression NE expression OR expression G expression
+    			  | expression NE expression OR expression GE expression
+    			  | expression NE expression OR expression LE expression
+    			  | expression NE expression OR expression EQ expression
+    			  | expression NE expression OR expression NE expression'''
+    boolean=False
+    if p[2] == '>':
+    	if p[1] > p[3]:
+    		boolean=True
+    elif p[2] == '<':
+    	if p[1] < p[3]:
+    		boolean=True
+    elif p[2] == '>=':
+    	if p[1] >= p[3]:
+    		boolean=True
+    elif p[2] == '<=':
+    	if p[1] <= p[3]:
+    		boolean=True
+    elif p[2] == '==':
+    	if p[1] == p[3]:
+    		boolean=True
+    elif p[2] == '!=':
+    	if p[1] != p[3]:
+    		boolean=True
+    boolean2=False
+    if p[6] == '>':
+    	if p[5] > p[7]:
+    		boolean2=True
+    elif p[6] == '<':
+    	if p[5] < p[7]:
+    		boolean2=True
+    elif p[6] == '>=':
+    	if p[5] >= p[7]:
+    		boolean2=True
+    elif p[6] == '<=':
+    	if p[5] <= p[7]:
+    		boolean2=True
+    elif p[6] == '==':
+    	if p[5] == p[7]:
+    		boolean2=True
+    elif p[6] == '!=':
+    	if p[5] != p[7]:
+    		boolean2=True
+    if boolean==True or boolean2==True:
+    	p[0]=True
+    else:
+    	p[0]=False
+    print(p[0])
 def p_function_def(p):
     'statement : FUNCTION expression LPAREN expression RPAREN LBRACE expression RBRACE'
     print("function def")
@@ -174,12 +327,13 @@ def p_expression_group(p):
     "expression : '(' expression ')'"
     p[0] = p[2]
 def p_in_comparison(p):
-    '''statement : expression IN expression
-    		   | expression NOT IN expression'''
-    if p[1] in p[3]:
-    	p[0]=True
-    else:
-    	p[0]=False
+   	"statement :  expression IN expression"
+   	if p[1] in p[3]:
+   		p[0]=True
+   	else:
+   		p[0]=False
+   
+   	
 
 
 def p_expression_number(p):
@@ -191,7 +345,7 @@ def p_expression_array(p):
 		p[0] = p[1].split(',')
 	except:
 		p[0] = p[1]
-
+ 
 def p_expression_string(p):
     "expression : STRING"
     p[0] = p[1]
@@ -231,9 +385,15 @@ while True:
     if not s:
         continue
     if ".sap" not in s:
-    	yacc.parse(s.replace(';',''))
+
+   		yacc.parse(s.replace(';',''))
     else:
-    	f = open(str(os.path.dirname(os.path.realpath(__file__)))+"/"+s.replace(";",""), "r")
+    	lexer.lineno=1
+    	if'/' not in s:
+    		f = open(str(os.path.dirname(os.path.realpath(__file__)))+"/"+s.replace(";",""), "r")
+    	else:
+    		f = open(s.replace(";",""), "r")
+
     	for line in f:
     		yacc.parse(line.replace(";",""))
 
