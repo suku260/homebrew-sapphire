@@ -1,0 +1,20 @@
+z=0;
+x=1;
+y=2;
+x>y;
+"if loop";
+if(y>x)
+{
+	z=1
+};
+
+z;
+"while loop";
+y=10;
+while(x<y)
+{
+	x=x+1
+
+};
+
+x;
