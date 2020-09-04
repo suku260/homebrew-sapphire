@@ -3,10 +3,10 @@ import sys
 sys.path.insert(0, "../..")
 
 tokens = (
-    'NAME','IN','NOT','ARRAY','INPUT','STRING','CLASS','BUILD','FUNCTION','SEMI','AND','OR','NUMBER','LE','SEP','GE','EQ','NE','G','L','LBRACK','RBRACK','LPAREN','RPAREN','LBRACE','RBRACE','IF','WHILE','FOR'
+    'NAME','IN','NOT','ARRAY','INPUT','STRING','CLASS','BUILD','FUNCTION','AND','OR','NUMBER','LE','GE','EQ','NE','G','L','LPAREN','RPAREN','LBRACE','RBRACE','IF','WHILE','FOR'
 )
 
-literals = ['=', '+','.','-', '*', '/', '(', ')','^','%',',','{','}']
+literals = ['=', '+','.','-', '*', '/','^','%',',']
 
 # Tokens
 t_LE=r'<='
@@ -16,24 +16,21 @@ t_NE=r'!='
 t_OR = r'\|\|'
 t_AND = r'&&'
 t_G=r'>'
-t_SEP=r','
 t_L=r'<'
 t_CLASS=r'class'
 t_BUILD=r'build'
 t_FUNCTION=r'function'
 t_FOR=r'for'
 t_IF=r'if'
-t_SEMI = r';'
 t_WHILE=r'while'
 t_IN=r'in'
 t_NOT=r'not'
-t_LBRACK=r'\['
-t_RBRACK=r'\]'
 t_LBRACE=r'\{'
 t_RBRACE=r'\}'
 t_LPAREN=r'\('
 t_INPUT=r'input'
 t_RPAREN=r'\)'
+
 
 
 t_NAME = r'[a-zA-Z_][a-zA-Z0-9_]*'
@@ -327,11 +324,14 @@ def p_expression_group(p):
     "expression : '(' expression ')'"
     p[0] = p[2]
 def p_in_comparison(p):
-   	"statement :  expression IN expression"
+   	"statement : expression IN expression"
+   	
+   	boolean3=False
    	if p[1] in p[3]:
-   		p[0]=True
+   		boolean3=True
    	else:
-   		p[0]=False
+   		boolean3=False
+   	p[0]=True
    
    	
 
