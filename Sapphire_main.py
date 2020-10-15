@@ -4,7 +4,7 @@ import sys
 sys.path.insert(0, "../..")
 
 tokens = (
-    'NAME','ARRAY','ID','STRING','AND','OR','NUMBER','LE','GE','EQ','NE','G','L','LPAREN','RPAREN','LBRACE','RBRACE')
+    'NAME','ARRAY','ID','STRING','AND','OR','NUMBER','LE','GE','EQ','NE','G','L','LPAREN','RPAREN','LBRACE','RBRACE','IN')
 
 literals = ['=', '+','.','-', '*', '/','^','%',',']
 
@@ -21,6 +21,7 @@ t_LBRACE=r'\{'
 t_RBRACE=r'\}'
 t_LPAREN=r'\('
 t_RPAREN=r'\)'
+t_IN=r'in'
 reserved= {
 'CLASS' : 'class',
 'BUILD' : 'build',
@@ -28,7 +29,6 @@ reserved= {
 'FOR' : 'for',
 'IF' : 'if',
 'WHILE' : 'while',
-'IN' : 'in',
 'NOT' : 'not',
 'INPUT' : 'input'}
 
@@ -60,12 +60,7 @@ def t_newline(t):
 def t_error(t):
     print("Illegal character '%s'" % t.value[0])
     t.lexer.skip(1)
-"""def t_ID(t):
-	r'[clasbuildfuntonrwhetp]'
-	if t.value in reserved:
-		t.type = reserved[ t.value ]
-		return t"""
-	
+
 # Build the lexer
 import ply.lex as lex
 lexer = lex.lex()
@@ -83,15 +78,17 @@ precedence = (
 names = {}
 imports = {}
 def p_statement_assign(p):
-    'statement : NAME "=" expression'
-    names[p[1]] = p[3]
+	'statement : NAME "=" expression'
+	if p[1] not in tokens:
+		names[p[1]] = p[3]
+	else:
+		print("cannot use a reserved keyword for a variable")
 def p_input_assign(p):
     'statement : NAME "=" input LPAREN expression RPAREN'
     x=input('\n')
     names[p[1]] = x
 def p_in_comparison(p):
-   	"expression : expression in expression"
-   	
+   	"statement : expression IN expression"
    	boolean3=False
    	if p[1] in p[3]:
    		boolean3=True
