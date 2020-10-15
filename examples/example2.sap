@@ -1,0 +1,6 @@
+a="h";
+b="hello";
+c=5;
+d=[4,2,5];
+a in b;
+c in d;

@@ -1,0 +1,8 @@
+Package: sapphire
+Version: 0.6.2
+Section: custom
+Priority: optional
+Architecture: linux
+Essential: no
+Maintainer: www.github.com/suku260/sapphire
+Description: Sapphire Programmign Language
