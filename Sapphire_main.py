@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import os
 import sys
+import pip
 sys.path.insert(0, "../..")
-
+pip.main(["install", "--user", "ply"])
 tokens = (
     'NAME','ARRAY','ID','STRING','AND','OR','NUMBER','LE','GE','EQ','NE','G','L','LPAREN','RPAREN','LBRACE','RBRACE','IN')
 
