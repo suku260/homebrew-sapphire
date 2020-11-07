@@ -4,7 +4,7 @@ import sys
 sys.path.insert(0, "../..")
 
 tokens = (
-    'NAME', 'NUMBER','STRING','ARRAY','OR','LE','GE','EQ','NE','AND','LBRACE','RBRACE','LPAREN','RPAREN','IN','L','G'
+    'NAME', 'FOR','WHILE','IF','NUMBER','STRING','ARRAY','OR','LE','GE','EQ','NE','AND','LBRACE','RBRACE','LPAREN','RPAREN','IN','L','G'
 )
 
 literals = ['=', '+', '-', '*', '/', '(', ')']
@@ -29,9 +29,7 @@ reserved= {
 'CLASS' : 'class',
 'BUILD' : 'build',
 'FUNCTION' : 'function',
-'FOR' : 'for',
-'IF' : 'if',
-'WHILE' : 'while',
+
 'NOT' : 'not',
 'INPUT' : 'input'}
 
@@ -57,6 +55,15 @@ def t_ARRAY(t):
 t_ignore = " \t"
 def t_IN(t):
 	r'in'
+	return t
+def t_FOR(t):
+	r'for'
+	return t
+def t_WHILE(t):
+	r'while'
+	return t
+def t_IF(t):
+	r'if'
 	return t
 def t_newline(t):
     r'\n+'
@@ -108,14 +115,29 @@ def p_in_comparison(p):
    		boolean3=False
 	print(boolean3)
 def p_if_loop(p):
-	'statement : if LPAREN expression RPAREN LBRACE expression RBRACE'
-	print(f" if {p[3]} is true then do {p[6]}")
+	'statement : IF LPAREN expression RPAREN LBRACE expression RBRACE'
+	action='do'
+	if p[3]==True:
+		action=action
+	else:
+		action = 'dont do'
+	print(f" if {p[3]} then {action} {p[6]}")
 def p_while_loop(p):
-	'statement : while LPAREN expression RPAREN LBRACE expression RBRACE'
-	print(f" while {p[3]} is true then do {p[6]}")
+	'statement : WHILE LPAREN expression RPAREN LBRACE expression RBRACE'
+	action='do'
+	if p[3]==True:
+		action=action
+	else:
+		action = 'dont do'
+	print(f" while {p[3]} then {action} {p[6]}")
 def p_for_loop(p):
-	'statement : for LPAREN expression RPAREN LBRACE expression RBRACE'
-	print(f" for {p[3]} is true then do {p[6]}")
+	'statement : FOR LPAREN expression RPAREN LBRACE expression RBRACE'
+	action='do'
+	if p[3]==True:
+		action=action
+	else:
+		action = 'dont do'
+	print(f" for {p[3]} then {action} {p[6]}")
 def p_conditional_and(p):
     '''statement : expression L expression AND expression L expression
     			  | expression L expression AND expression G expression
