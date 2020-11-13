@@ -12,5 +12,8 @@ under development v0.6.3
   body {
     color: red;
   }
+  a{
+  color: red;
+  }
 </style>
 
