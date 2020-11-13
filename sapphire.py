@@ -3,9 +3,7 @@ from ply import *
 import sys
 sys.path.insert(0, "../..")
 
-tokens = (
-    'NAME','INPUT','BUILD','CLASS','FUNCTION', 'FOR','WHILE','IF','NUMBER','STRING','ARRAY','OR','LE','GE','EQ','NE','AND','LBRACE','RBRACE','LPAREN','RPAREN','IN','L','G'
-)
+tokens = ('NAME','INPUT','BUILD','CLASS','FUNCTION', 'FOR','WHILE','IF','NUMBER','STRING','ARRAY','OR','LE','GE','EQ','NE','AND','LBRACE','RBRACE','LPAREN','RPAREN','IN','L','G')
 
 literals = ['=', '+', '-', '*', '/', '(', ')']
 
@@ -25,7 +23,9 @@ t_RBRACE=r'\}'
 t_LPAREN=r'\('
 t_RPAREN=r'\)'
 
+
 reserved= {}
+
 
 tokens=tokens+(tuple(reserved.values()))
 t_NAME = r'[a-zA-Z_][a-zA-Z0-9_]*'
@@ -59,6 +59,7 @@ def t_WHILE(t):
 def t_IF(t):
 	r'if'
 	return t
+
 def t_INPUT(t):
 	r'store'
 	return t
@@ -71,6 +72,7 @@ def t_CLASS(t):
 def t_BUILD(t):
 	r'build'
 	return t
+
 def t_newline(t):
     r'\n+'
     t.lexer.lineno += t.value.count("\n")
@@ -133,6 +135,7 @@ def p_if_loop(p):
 	'statement : IF LPAREN expression RPAREN LBRACE statement RBRACE'
 	action='do'
 
+
 	if p[3]:
 		p[6]
 	else:
@@ -146,13 +149,13 @@ def p_if_loop(p):
 	print(f" if {p[3]} then {action} {p[6]}")
 def p_while_loop(p):
 	'statement : WHILE LPAREN expression RPAREN LBRACE statement RBRACE'
+
 	action='do'
 	if p[3]==True:
 		action=action
 	else:
 		action = 'dont do'
-	while p[3]:
-		p[6]
+
 	print(f" while {p[3]} then {action} {p[6]}")
 def p_for_loop(p):
 	'statement : FOR LPAREN NUMBER IN ARRAY RPAREN LBRACE statement RBRACE'
