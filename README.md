@@ -3,7 +3,7 @@
 
 Sapphire Programming Language
 
-<align='center'><button> Download the Zip </button> <button> Download the Tar.gz </button> </align>
+
 
 tehkensei@gmail.com
 
