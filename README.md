@@ -2,7 +2,7 @@
 
 Sapphire Programming Language
 
-<button> Download the Zip </button> <button> Download the Tar.gz </button> <button> Find Us on github </button>
+<button> Download the Zip </button> <button> Download the Tar.gz </button> 
 
 tehkensei@gmail.com
 
