@@ -7,7 +7,7 @@ tehkensei@gmail.com
 
 Support the project: https://ko-fi.com/sapphireprogramminglanguage
 
-under development v0.5.2
+under development v0.6.3
 
 ## Example Code
 ```
@@ -20,7 +20,7 @@ class classname(param)
   }
 };
 process main(){
-  class newinstance = new class();
-  newinstance.run();
+  class newinstance = new class()
+  newinstance.run()
 };
 
