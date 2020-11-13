@@ -1,6 +1,6 @@
 [About](about.md)
 [Documentation](https://github.com/suku260/sapphire.wiki.git)
-[[Downloads]]
+[Downloads](https://www.google.com)
 
 tehkensei@gmail.com
 
