@@ -1,12 +1,13 @@
-# Sapphire   <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvjPQ-AVM5M4ZbgJ8bLwIOouK8pREccRvsmNolnKsNBh3JIX9W&s" alt="Your image title" width="50"/>
+# Sapphire  
+<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvjPQ-AVM5M4ZbgJ8bLwIOouK8pREccRvsmNolnKsNBh3JIX9W&s" alt="Your image title" width="50"/>
 
 Sapphire Programming Language
 
-<center><button> Download the Zip </button> <button> Download the Tar.gz </button> </center>
+<align='center'><button> Download the Zip </button> <button> Download the Tar.gz </button> </align>
 
 tehkensei@gmail.com
 
-Support the project: https://ko-fi.com/sapphireprogramminglanguage
+Support the project: <a> https://ko-fi.com/sapphireprogramminglanguage </a>
 
 under development v0.6.3
 
