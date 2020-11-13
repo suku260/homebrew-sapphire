@@ -6,8 +6,7 @@ navbar-links:
     - Windows: "https://beautifuljekyll.com"
     - Mac: "https://www.markdowntutorial.com/"
     - Linux: "https://www.google.com/"
-  Author's home: "https://deanattali.com"
-  avatar: "/assets/img/avatar-icon.png"
+  avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvjPQ-AVM5M4ZbgJ8bLwIOouK8pREccRvsmNolnKsNBh3JIX9W&s"
   round-avatar: true
   social-network-links:
   email: "someone@example.com"
