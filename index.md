@@ -11,7 +11,7 @@ under development v0.6.3
 <style>
   body {
     color: red;
-    background-color: sky blue;
+    background-color: blue;
   }
   a{
   color: red;
