@@ -7,4 +7,21 @@ navbar-links:
     - Mac: "https://www.markdowntutorial.com/"
     - Linux: "https://www.google.com/"
   Author's home: "https://deanattali.com"
-
+  avatar: "/assets/img/avatar-icon.png"
+  round-avatar: true
+  social-network-links:
+  email: "someone@example.com"
+  facebook: deanattali
+  github: daattali
+  twitter: daattali
+url-pretty: "MyWebsite.com"
+navbar-col: "#EAEAEA"
+navbar-text-col: "#404040"
+navbar-border-col: "#DDDDDD"
+page-col: "#FFFFFF"
+text-col: "#404040"
+link-col: "#008AFF"
+hover-col: "#0085A1"
+footer-col: "#EAEAEA"
+footer-text-col: "#777777"
+footer-link-col: "#404040"
