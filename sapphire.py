@@ -3,9 +3,7 @@ from ply import *
 import sys
 sys.path.insert(0, "../..")
 
-tokens = (
-    'NAME', 'FOR','WHILE','IF','NUMBER','STRING','ARRAY','OR','LE','GE','EQ','NE','AND','LBRACE','RBRACE','LPAREN','RPAREN','IN','L','G'
-)
+tokens = ('NAME','INPUT','BUILD','CLASS','FUNCTION', 'FOR','WHILE','IF','NUMBER','STRING','ARRAY','OR','LE','GE','EQ','NE','AND','LBRACE','RBRACE','LPAREN','RPAREN','IN','L','G')
 
 literals = ['=', '+', '-', '*', '/', '(', ')']
 
@@ -25,13 +23,9 @@ t_RBRACE=r'\}'
 t_LPAREN=r'\('
 t_RPAREN=r'\)'
 
-reserved= {
-'CLASS' : 'class',
-'BUILD' : 'build',
-'FUNCTION' : 'function',
 
-'NOT' : 'not',
-'INPUT' : 'input'}
+reserved= {}
+
 
 tokens=tokens+(tuple(reserved.values()))
 t_NAME = r'[a-zA-Z_][a-zA-Z0-9_]*'
@@ -65,6 +59,20 @@ def t_WHILE(t):
 def t_IF(t):
 	r'if'
 	return t
+
+def t_INPUT(t):
+	r'store'
+	return t
+def t_FUNCTION(t):
+	r'function'
+	return t
+def t_CLASS(t):
+	r'class'
+	return t
+def t_BUILD(t):
+	r'build'
+	return t
+
 def t_newline(t):
     r'\n+'
     t.lexer.lineno += t.value.count("\n")
@@ -96,9 +104,18 @@ def p_statement_assign(p):
 	else:
 		print("cannot use a reserved keyword for a variable")
 def p_input_assign(p):
-    'statement : NAME "=" input LPAREN expression RPAREN'
-    x=input('\n')
-    names[p[1]] = x
+	'statement : NAME "=" INPUT LPAREN expression RPAREN'
+	x=input('enter your input for p[1]\n')
+	try:
+		x=x.replace(";","")
+	except:
+		x=x
+	try:
+		v = names[x]
+	except:
+		v=x
+    
+	names[p[1]] = v
 def p_in_comparison(p):
 	"statement : expression IN expression"
 	boolean3=False
@@ -117,18 +134,28 @@ def p_in_comparison(p):
 def p_if_loop(p):
 	'statement : IF LPAREN expression RPAREN LBRACE statement RBRACE'
 	action='do'
+
+
+	if p[3]:
+		p[6]
+	else:
+		p[6]= "not doing"
 	if p[3]==True:
 		action=action
+		
 	else:
 		action = 'dont do'
+		p[6]=""
 	print(f" if {p[3]} then {action} {p[6]}")
 def p_while_loop(p):
-	'statement : WHILE LPAREN expression RPAREN LBRACE expression RBRACE'
+	'statement : WHILE LPAREN expression RPAREN LBRACE statement RBRACE'
+
 	action='do'
 	if p[3]==True:
 		action=action
 	else:
 		action = 'dont do'
+
 	print(f" while {p[3]} then {action} {p[6]}")
 def p_for_loop(p):
 	'statement : FOR LPAREN NUMBER IN ARRAY RPAREN LBRACE statement RBRACE'
@@ -299,13 +326,13 @@ def p_conditional_or(p):
     	p[0]=False
     print(p[0])
 def p_function_def(p):
-    'statement : function expression LPAREN expression RPAREN LBRACE expression RBRACE'
+    'statement : FUNCTION expression LPAREN expression RPAREN LBRACE expression RBRACE'
     print("function def")
 def p_class_def(p):
-    'statement : class expression LPAREN expression RPAREN LBRACE expression RBRACE'
+    'statement : CLASS expression LPAREN expression RPAREN LBRACE expression RBRACE'
     print("class def")
 def p_build_def(p):
-    'statement : build expression LPAREN expression RPAREN LBRACE expression RBRACE'
+    'statement : BUILD expression LPAREN expression RPAREN LBRACE expression RBRACE'
     print("build def")
 def p_statement_expr(p):
     'statement : expression'
@@ -396,8 +423,7 @@ def p_error(p):
 
     if p:
         print(f"Syntax error on line {p.lineno} for position {p.lexpos} at symbol'%s'"  % p.value)
-    else:
-        print("Syntax error at EOF")
+    
 
 import ply.yacc as yacc
 parser = yacc.yacc()
