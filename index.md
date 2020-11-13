@@ -1,5 +1,6 @@
-[About me](about.md)
-[My blog](blog.md)
+[About](about.md)
+[Documentation](https://github.com/suku260/sapphire.wiki.git)
+[Downloads](blog.md)
 
 tehkensei@gmail.com
 
