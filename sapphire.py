@@ -132,39 +132,27 @@ def p_in_comparison(p):
    		boolean3=False
 	print(boolean3)
 def p_if_loop(p):
-	'statement : IF LPAREN expression RPAREN LBRACE statement RBRACE'
-	action='do'
-
-
-	if p[3]:
-		p[6]
-	else:
-		p[6]= "not doing"
-	if p[3]==True:
-		action=action
+	'''statement : IF LPAREN expression RPAREN LBRACE expression RBRACE
+		|  IF LPAREN expression RPAREN LBRACE NAME "=" expression RBRACE
+		|  IF LPAREN statement RPAREN LBRACE NAME "=" expression RBRACE
+		|  IF LPAREN statement RPAREN LBRACE NAME "=" statement RBRACE'''
 		
+	if p[3]==True:	
+		names[p[6]]=p[8]
 	else:
-		action = 'dont do'
-		p[6]=""
-	print(f" if {p[3]} then {action} {p[6]}")
+		p[6]=p[6]	
+	
 def p_while_loop(p):
-	'statement : WHILE LPAREN expression RPAREN LBRACE statement RBRACE'
-
-	action='do'
-	if p[3]==True:
-		action=action
-	else:
-		action = 'dont do'
-
-	print(f" while {p[3]} then {action} {p[6]}")
+	'''statement : WHILE LPAREN statement RPAREN LBRACE statement RBRACE
+		|  WHILE LPAREN statement RPAREN LBRACE NAME "=" statement RBRACE'''
+	while p[3]==True:
+		names[p[6]]=p[8]
+		
+	print(str(names))
 def p_for_loop(p):
-	'statement : FOR LPAREN NUMBER IN ARRAY RPAREN LBRACE statement RBRACE'
-	action='do'
-	if p[3]==True:
-		action=action
-	else:
-		action = 'dont do'
-	print(f" for {p[3]} then {action} {p[6]}")
+	'statement : FOR LPAREN expression IN ARRAY RPAREN LBRACE statement RBRACE'
+	for p[3] in p[5]:
+		p[8]
 def p_conditional_and(p):
     '''statement : expression L expression AND expression L expression
     			  | expression L expression AND expression G expression
@@ -326,19 +314,19 @@ def p_conditional_or(p):
     	p[0]=False
     print(p[0])
 def p_function_def(p):
-    'statement : FUNCTION expression LPAREN expression RPAREN LBRACE expression RBRACE'
+    'statement : FUNCTION expression LPAREN expression RPAREN LBRACE statement RBRACE'
     print("function def")
 def p_class_def(p):
-    'statement : CLASS expression LPAREN expression RPAREN LBRACE expression RBRACE'
+    'statement : CLASS expression LPAREN expression RPAREN LBRACE statement RBRACE'
     print("class def")
 def p_build_def(p):
-    'statement : BUILD expression LPAREN expression RPAREN LBRACE expression RBRACE'
+    'statement : BUILD expression LPAREN expression RPAREN LBRACE statement RBRACE'
     print("build def")
 def p_statement_expr(p):
     'statement : expression'
     if p[1] != None:
     	print(p[1])
-
+    
 def p_bool_cond(p):
 	'''expression : expression L expression
                    | expression G expression
@@ -410,6 +398,7 @@ def p_expression_array(p):
 def p_expression_string(p):
     "expression : STRING"
     p[0] = p[1]
+
 
 def p_expression_name(p):
     "expression : NAME"
