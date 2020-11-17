@@ -1,0 +1,26 @@
+theme: jekyll-theme-architect
+title: Sapphire 
+navbar-links:
+  About Sapphire: "About"
+  Downloads:
+    - Windows: "https://beautifuljekyll.com"
+    - Mac: "https://www.markdowntutorial.com/"
+    - Linux: "https://www.google.com/"
+  avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvjPQ-AVM5M4ZbgJ8bLwIOouK8pREccRvsmNolnKsNBh3JIX9W&s"
+  round-avatar: true
+  social-network-links:
+  email: "someone@example.com"
+  facebook: deanattali
+  github: daattali
+  twitter: daattali
+url-pretty: "MyWebsite.com"
+navbar-col: "#EAEAEA"
+navbar-text-col: "#404040"
+navbar-border-col: "#DDDDDD"
+page-col: "#FFFFFF"
+text-col: "#404040"
+link-col: "#008AFF"
+hover-col: "#0085A1"
+footer-col: "#EAEAEA"
+footer-text-col: "#777777"
+footer-link-col: "#404040"

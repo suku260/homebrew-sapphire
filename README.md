@@ -1,13 +1,15 @@
-# Sapphire   <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvjPQ-AVM5M4ZbgJ8bLwIOouK8pREccRvsmNolnKsNBh3JIX9W&s" alt="Your image title" width="50"/>
+# Sapphire  
+<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvjPQ-AVM5M4ZbgJ8bLwIOouK8pREccRvsmNolnKsNBh3JIX9W&s" alt="Your image title" width="50"/>
 
 Sapphire Programming Language
-Developed by Jay Kumar
+
+
 
 tehkensei@gmail.com
 
-Support the project: https://ko-fi.com/sapphireprogramminglanguage
+Support the project: <a> https://ko-fi.com/sapphireprogramminglanguage </a>
 
-under development v0.5.2
+under development v0.6.3
 
 ## Example Code
 ```
@@ -20,7 +22,7 @@ class classname(param)
   }
 };
 process main(){
-  class newinstance = new class();
-  newinstance.run();
+  class newinstance = new class()
+  newinstance.run()
 };
 
