@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['sapphire.py'],
-             pathex=['/home/kensei/Documents/Sapphire/Sapphire'],
+             pathex=['/home/kensei/Documents/Sapphire'],
              binaries=[],
              datas=[],
              hiddenimports=[],

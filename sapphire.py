@@ -1,9 +1,14 @@
+
 import os
-from ply import *
+try:
+	from ply import *
+except:
+	os.system("pip3 install ply")
+	from ply import *
 import sys
 sys.path.insert(0, "../..")
 
-tokens = ('NAME','INPUT','BUILD','CLASS','FUNCTION', 'FOR','WHILE','IF','NUMBER','STRING','ARRAY','OR','LE','GE','EQ','NE','AND','LBRACE','RBRACE','LPAREN','RPAREN','IN','L','G')
+tokens = ('NAME','INPUT','BUILD','CLASS','PRINT','FUNCTION', 'FOR','WHILE','IF','NUMBER','STRING','ARRAY','OR','LE','GE','EQ','NE','AND','LBRACE','RBRACE','LPAREN','RPAREN','IN','L','G')
 
 literals = ['=', '+', '-', '*', '/', '(', ')']
 
@@ -53,6 +58,9 @@ def t_IN(t):
 def t_FOR(t):
 	r'for'
 	return t
+def t_PRINT(t):
+	r'print'
+	return t
 def t_WHILE(t):
 	r'while'
 	return t
@@ -97,6 +105,9 @@ precedence = (
 # dictionary of names
 names = {}
 imports = {}
+def p_print(p):
+	'statement : PRINT expression'
+	print(p[2])
 def p_statement_assign(p):
 	'statement : NAME "=" expression'
 	if p[1] not in tokens:
@@ -135,7 +146,8 @@ def p_if_loop(p):
 	'''statement : IF LPAREN expression RPAREN LBRACE expression RBRACE
 		|  IF LPAREN expression RPAREN LBRACE NAME "=" expression RBRACE
 		|  IF LPAREN statement RPAREN LBRACE NAME "=" expression RBRACE
-		|  IF LPAREN statement RPAREN LBRACE NAME "=" statement RBRACE'''
+		|  IF LPAREN statement RPAREN LBRACE NAME "=" statement RBRACE
+		|  IF LPAREN statement RPAREN LBRACE  statement RBRACE'''
 		
 	if p[3]==True:	
 		names[p[6]]=p[8]

@@ -1,0 +1,3 @@
+x=store("hello this will be input")
+
+x;
