@@ -1,5 +1,6 @@
 
 import os
+import ast
 try:
 	from ply import *
 except:
@@ -8,7 +9,7 @@ except:
 import sys
 sys.path.insert(0, "../..")
 
-tokens = ('NAME','INPUT','BUILD','CLASS','PRINT','FUNCTION', 'FOR','WHILE','IF','NUMBER','STRING','ARRAY','OR','LE','GE','EQ','NE','AND','LBRACE','RBRACE','LPAREN','RPAREN','IN','L','G')
+tokens = ('ELSE','NAME','INPUT','BUILD','CLASS','PRINT','FUNCTION', 'FOR','WHILE','IF','NUMBER','STRING','ARRAY','OR','LE','GE','EQ','NE','AND','LBRACE','RBRACE','LPAREN','RPAREN','IN','L','G')
 
 literals = ['=', '+', '-', '*', '/', '(', ')']
 
@@ -67,6 +68,9 @@ def t_WHILE(t):
 def t_IF(t):
 	r'if'
 	return t
+def t_ELSE(t):
+	r'else'
+	return t
 
 def t_INPUT(t):
 	r'store'
@@ -104,16 +108,31 @@ precedence = (
 
 # dictionary of names
 names = {}
+classes={}
+methods={}
 imports = {}
 def p_print(p):
-	'statement : PRINT expression'
+	'''statement : PRINT expression'''
 	print(p[2])
-def p_statement_assign(p):
-	'statement : NAME "=" expression'
+def p_class_assign(p):
+	'statement : CLASS LPAREN expression RPAREN LBRACE  expression RBRACE'
 	if p[1] not in tokens:
-		names[p[1]] = p[3]
+		classes[p[3]] = p[6]
 	else:
 		print("cannot use a reserved keyword for a variable")
+def p_statement_assign(p):
+	'''statement : NAME "=" expression
+	| statement NAME '=' expression'''
+	pass
+	if p[1] not in tokens:
+		names[p[1]] = p[3]
+		try:
+			names[p[2]]=p[4]
+		except:
+			p[3]=p[3]
+	else:
+		print("cannot use a reserved keyword for a variable")
+
 def p_input_assign(p):
 	'statement : NAME "=" INPUT LPAREN expression RPAREN'
 	x=input('enter your input for p[1]\n')
@@ -142,222 +161,33 @@ def p_in_comparison(p):
 	else:
    		boolean3=False
 	print(boolean3)
-def p_if_loop(p):
-	'''statement : IF LPAREN expression RPAREN LBRACE expression RBRACE
-		|  IF LPAREN expression RPAREN LBRACE NAME "=" expression RBRACE
-		|  IF LPAREN statement RPAREN LBRACE NAME "=" expression RBRACE
-		|  IF LPAREN statement RPAREN LBRACE NAME "=" statement RBRACE
-		|  IF LPAREN statement RPAREN LBRACE  statement RBRACE'''
-		
-	if p[3]==True:	
-		names[p[6]]=p[8]
-	else:
-		p[6]=p[6]	
-	
-def p_while_loop(p):
-	'''statement : WHILE LPAREN NAME L expression RPAREN LBRACE NAME "=" expression "+" expression RBRACE
-	| WHILE LPAREN NAME L expression RPAREN LBRACE NAME "=" expression "-" expression RBRACE
-	| WHILE LPAREN NAME L expression RPAREN LBRACE NAME "=" expression "*" expression RBRACE
-	| WHILE LPAREN NAME L expression RPAREN LBRACE NAME "=" expression "/" expression RBRACE
-	| WHILE LPAREN NAME L expression RPAREN LBRACE NAME "=" expression "^" expression RBRACE
-	| WHILE LPAREN NAME L expression RPAREN LBRACE NAME "=" expression "%" expression RBRACE
-	| WHILE LPAREN NAME G expression RPAREN LBRACE NAME "=" expression "+" expression RBRACE
-	| WHILE LPAREN NAME G expression RPAREN LBRACE NAME "=" expression "-" expression RBRACE
-	| WHILE LPAREN NAME G expression RPAREN LBRACE NAME "=" expression "*" expression RBRACE
-	| WHILE LPAREN NAME G expression RPAREN LBRACE NAME "=" expression "/" expression RBRACE
-	| WHILE LPAREN NAME G expression RPAREN LBRACE NAME "=" expression "^" expression RBRACE
-	| WHILE LPAREN NAME G expression RPAREN LBRACE NAME "=" expression "%" expression RBRACE
-	| WHILE LPAREN NAME GE expression RPAREN LBRACE NAME "=" expression "+" expression RBRACE
-	| WHILE LPAREN NAME GE expression RPAREN LBRACE NAME "=" expression "-" expression RBRACE
-	| WHILE LPAREN NAME GE expression RPAREN LBRACE NAME "=" expression "*" expression RBRACE
-	| WHILE LPAREN NAME GE expression RPAREN LBRACE NAME "=" expression "/" expression RBRACE
-	| WHILE LPAREN NAME GE expression RPAREN LBRACE NAME "=" expression "^" expression RBRACE
-	| WHILE LPAREN NAME GE expression RPAREN LBRACE NAME "=" expression "%" expression RBRACE
-	| WHILE LPAREN NAME LE expression RPAREN LBRACE NAME "=" expression "+" expression RBRACE
-	| WHILE LPAREN NAME LE expression RPAREN LBRACE NAME "=" expression "-" expression RBRACE
-	| WHILE LPAREN NAME LE expression RPAREN LBRACE NAME "=" expression "*" expression RBRACE
-	| WHILE LPAREN NAME LE expression RPAREN LBRACE NAME "=" expression "/" expression RBRACE
-	| WHILE LPAREN NAME LE expression RPAREN LBRACE NAME "=" expression "^" expression RBRACE
-	| WHILE LPAREN NAME LE expression RPAREN LBRACE NAME "=" expression "%" expression RBRACE
-	| WHILE LPAREN NAME NE expression RPAREN LBRACE NAME "=" expression "+" expression RBRACE
-	| WHILE LPAREN NAME NE expression RPAREN LBRACE NAME "=" expression "-" expression RBRACE
-	| WHILE LPAREN NAME NE expression RPAREN LBRACE NAME "=" expression "*" expression RBRACE
-	| WHILE LPAREN NAME NE expression RPAREN LBRACE NAME "=" expression "/" expression RBRACE
-	| WHILE LPAREN NAME NE expression RPAREN LBRACE NAME "=" expression "^" expression RBRACE
-	| WHILE LPAREN NAME NE expression RPAREN LBRACE NAME "=" expression "%" expression RBRACE'''
-	if p[3] in names:
-		value=names[p[3]]
-	else:
-		value=p[3]
-	if p[5] in names:
-		value2 =names[p[5]]
-	else:
-		value2=p[5]
-	print(value)
-	print(str(names))
-	print(str(names[p[3]]))
-	if(p[4]=="<"):
-		while value<value2:
-			if p[11]=='+':
-				value=value+int(p[12])
-			if p[11]=='-':
-				value=value-int(p[12])
-			if p[11]=='*':
-				value=value*int(p[12])
-			if p[11]=='^':
-				value=value**int(p[12])
-			if p[11]=='/':
-				value=value/int(p[12])
-			if p[11]=='%':
-				value=value%int(p[12])
-	elif(p[4]==">"):
-		while value>value2:
-			if p[11]=='+':
-				value=value+int(p[12])
-			if p[11]=='-':
-				value=value-int(p[12])
-			if p[11]=='*':
-				value=value*int(p[12])
-			if p[11]=='^':
-				value=value**int(p[12])
-			if p[11]=='/':
-				value=value/int(p[12])
-			if p[11]=='%':
-				value=value%int(p[12])
-	elif(p[4]==">="):
-		while value>=value2:
-			if p[11]=='+':
-				value=value+int(p[12])
-			if p[11]=='-':
-				value=value-int(p[12])
-			if p[11]=='*':
-				value=value*int(p[12])
-			if p[11]=='^':
-				value=value**int(p[12])
-			if p[11]=='/':
-				value=value/int(p[12])
-			if p[11]=='%':
-				value=value%int(p[12])
-	elif(p[4]=="<="):
-		while value<=value2:
-			if p[11]=='+':
-				value=value+int(p[12])
-			if p[11]=='-':
-				value=value-int(p[12])
-			if p[11]=='*':
-				value=value*int(p[12])
-			if p[11]=='^':
-				value=value**int(p[12])
-			if p[11]=='/':
-				value=value/int(p[12])
-			if p[11]=='%':
-				value=value%int(p[12])
-	elif(p[4]=="!="):
-		while value!=value2:
-			if p[11]=='+':
-				value=value+int(p[12])
-			if p[11]=='-':
-				value=value-int(p[12])
-			if p[11]=='*':
-				value=value*int(p[12])
-			if p[11]=='^':
-				value=value**int(p[12])
-			if p[11]=='/':
-				value=value/int(p[12])
-			if p[11]=='%':
-				value=value%int(p[12])
-	else:
-		print("Syntax error: unrecognized comparison in loop")
+
+def p_statement_list(p):
+	'''statement_list : statement
+                   | statement_list statement'''
+
 	try:
-		names[p[3]]=value
-		names[p[5]]=value2
-		print(str(names))
+		p[1]=p[1]+p[2]
 	except:
-		print("Syntax error: Misvalued elements in loop")
+		p[1]=p[1]
+	p[0] = p[1]
+def p_if_loop(p):
+	'''statement : IF LPAREN expression RPAREN LBRACE statement_list RBRACE ELSE LBRACE statement_list RBRACE
+    '''		
+	p[0] = ast.If(p[2], p[4], p[7])
+
+def p_while_loop(p):
+    '''
+    statement : WHILE LPAREN expression RPAREN LBRACE statement_list RBRACE
+    '''
+    p[0] = ast.While(p[2], p[4])
+
+	
 def p_for_loop(p):	
-	'''statement : FOR LPAREN NAME "=" expression NAME L NUMBER  RPAREN LBRACE NAME "=" expression "+" expression RBRACE
-	             | FOR LPAREN NAME "=" expression NAME L NUMBER  RPAREN LBRACE NAME "=" expression "-" expression RBRACE
-				 | FOR LPAREN NAME "=" expression NAME L NUMBER  RPAREN LBRACE NAME "=" expression "*" expression RBRACE
-				 | FOR LPAREN NAME "=" expression NAME L NUMBER  RPAREN LBRACE NAME "=" expression "/" expression RBRACE
-				 | FOR LPAREN NAME "=" expression NAME L NUMBER  RPAREN LBRACE NAME "=" expression "^" expression RBRACE
-				 | FOR LPAREN NAME "=" expression NAME L NUMBER  RPAREN LBRACE NAME "=" expression "%" expression RBRACE
-				 | FOR LPAREN NAME "=" expression NAME G NUMBER  RPAREN LBRACE NAME "=" expression "+" expression RBRACE
-				 | FOR LPAREN NAME "=" expression NAME G NUMBER  RPAREN LBRACE NAME "=" expression "-" expression RBRACE
-				 | FOR LPAREN NAME "=" expression NAME G NUMBER  RPAREN LBRACE NAME "=" expression "*" expression RBRACE
-				 | FOR LPAREN NAME "=" expression NAME G NUMBER  RPAREN LBRACE NAME "=" expression "/" expression RBRACE
-				 | FOR LPAREN NAME "=" expression NAME G NUMBER  RPAREN LBRACE NAME "=" expression "^" expression RBRACE
-				 | FOR LPAREN NAME "=" expression NAME G NUMBER  RPAREN LBRACE NAME "=" expression "%" expression RBRACE
-				 | FOR LPAREN NAME "=" expression NAME GE NUMBER  RPAREN LBRACE NAME "=" expression "+" expression RBRACE
-				 | FOR LPAREN NAME "=" expression NAME GE NUMBER  RPAREN LBRACE NAME "=" expression "-" expression RBRACE
-				 | FOR LPAREN NAME "=" expression NAME GE NUMBER  RPAREN LBRACE NAME "=" expression "*" expression RBRACE
-				 | FOR LPAREN NAME "=" expression NAME GE NUMBER  RPAREN LBRACE NAME "=" expression "/" expression RBRACE
-				 | FOR LPAREN NAME "=" expression NAME GE NUMBER  RPAREN LBRACE NAME "=" expression "^" expression RBRACE
-				 | FOR LPAREN NAME "=" expression NAME GE NUMBER  RPAREN LBRACE NAME "=" expression "%" expression RBRACE
-				 | FOR LPAREN NAME "=" expression NAME LE NUMBER  RPAREN LBRACE NAME "=" expression "+" expression RBRACE
-				 | FOR LPAREN NAME "=" expression NAME LE NUMBER  RPAREN LBRACE NAME "=" expression "-" expression RBRACE
-				 | FOR LPAREN NAME "=" expression NAME LE NUMBER  RPAREN LBRACE NAME "=" expression "*" expression RBRACE
-				 | FOR LPAREN NAME "=" expression NAME LE NUMBER  RPAREN LBRACE NAME "=" expression "/" expression RBRACE
-				 | FOR LPAREN NAME "=" expression NAME LE NUMBER  RPAREN LBRACE NAME "=" expression "^" expression RBRACE
-				 | FOR LPAREN NAME "=" expression NAME LE NUMBER  RPAREN LBRACE NAME "=" expression "%" expression RBRACE'''
-	names[p[3]]=p[5]
-	value=int(p[5])
-	if p[7] =="<":
-		while value < p[8]:
-			if p[14]=="+":
-				value=value+int(p[15])
-			elif p[14]=="-":
-				value=value-int(p[15])
-			elif p[14]=="*":
-				value=value*int(p[15])
-			elif p[14]=="/":
-				value=value/int(p[15])
-			elif p[14]=="^":
-				value=value**int(p[15])
-			elif p[14]=="%":
-				value=value%int(p[15])
-	elif p[7] =="<=":
-		while value <= p[8]:
-			if p[14]=="+":
-				value=value+int(p[15])
-			elif p[14]=="-":
-				value=value-int(p[15])
-			elif p[14]=="*":
-				value=value*int(p[15])
-			elif p[14]=="/":
-				value=value/int(p[15])
-			elif p[14]=="^":
-				value=value**int(p[15])
-			elif p[14]=="%":
-				value=value%int(p[15])
-	if p[7] ==">":
-		while value > p[8]:
-			if p[14]=="+":
-				value=value+int(p[15])
-			elif p[14]=="-":
-				value=value-int(p[15])
-			elif p[14]=="*":
-				value=value*int(p[15])
-			elif p[14]=="/":
-				value=value/int(p[15])
-			elif p[14]=="^":
-				value=value**int(p[15])
-			elif p[14]=="%":
-				value=value%int(p[15])
-	if p[7] ==">=":
-		while value >= p[8]:
-			if p[14]=="+":
-				value=value+int(p[15])
-			elif p[14]=="-":
-				value=value-int(p[15])
-			elif p[14]=="*":
-				value=value*int(p[15])
-			elif p[14]=="/":
-				value=value/int(p[15])
-			elif p[14]=="^":
-				value=value**int(p[15])
-			elif p[14]=="%":
-				value=value%int(p[15])
-	names[p[3]]=value
+    '''
+    statement : FOR expression IN expression  expression LBRACE statement_list RBRACE
+              '''
+    p[0] = ast.For(p[2], p[4], p[6], p[5] == '->', p[8])
 	
 def p_conditional_and(p):
     '''statement : expression L expression AND expression L expression
@@ -566,7 +396,8 @@ def p_expression_binop(p):
                   | expression '*' expression
                   | expression '/' expression
                   | expression '^' expression
-                  | expression '%' expression'''
+                  | expression '%' expression
+				  '''
     if p[2] == '+':
         p[0] = p[1] + p[3]
     elif p[2] == '-':
@@ -605,13 +436,20 @@ def p_expression_string(p):
     "expression : STRING"
     p[0] = p[1]
 
-
+def p_args_group(p):
+    "expression : expression"
 def p_expression_name(p):
     "expression : NAME"
     try:
         p[0] = names[p[1]]
     except LookupError:
         p[0] = f'undefined variable {p[1]} not found'
+def p_expression_class(p):
+    "expression : expression LPAREN expression RPAREN"
+    try:
+        p[0] = classes[p[1]+p[2]+p[3]+p[4]]
+    except LookupError:
+        p[0] = f'undefined class {p[1]} not found'
 
 
 def p_error(p):
