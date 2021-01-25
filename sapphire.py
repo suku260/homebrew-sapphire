@@ -1,6 +1,6 @@
 
 import os
-import ast
+import readline
 try:
 	from ply import *
 except:
@@ -9,7 +9,9 @@ except:
 import sys
 sys.path.insert(0, "../..")
 
-tokens = ('ELSE','NAME','INPUT','BUILD','CLASS','PRINT','FUNCTION', 'FOR','WHILE','IF','NUMBER','STRING','ARRAY','OR','LE','GE','EQ','NE','AND','LBRACE','RBRACE','LPAREN','RPAREN','IN','L','G')
+
+
+tokens = ('RETURN','ELSE','NAME','INPUT','BUILD','CLASS','PRINT','FUNCTION', 'FOR','WHILE','IF','NUMBER','STRING','ARRAY','OR','LE','GE','EQ','NE','AND','LBRACE','RBRACE','LPAREN','RPAREN','IN','L','G')
 
 literals = ['=', '+', '-', '*', '/', '(', ')']
 
@@ -55,6 +57,9 @@ def t_ARRAY(t):
 t_ignore = " \t"
 def t_IN(t):
 	r'in'
+	return t
+def t_RETURN(t):
+	r'return'
 	return t
 def t_FOR(t):
 	r'for'
@@ -172,22 +177,32 @@ def p_statement_list(p):
 		p[1]=p[1]
 	p[0] = p[1]
 def p_if_loop(p):
-	'''statement : IF LPAREN expression RPAREN LBRACE statement_list RBRACE ELSE LBRACE statement_list RBRACE
-    '''		
-	p[0] = ast.If(p[2], p[4], p[7])
+	'''statement : IF LPAREN expression RPAREN LBRACE statement RBRACE ELSE LBRACE statement_list RBRACE'''
+	print(s)
+	print("if")
+	for i in range(readline.get_current_history_length()):
+		print(readline.get_history_item(i + 1))
+	
 
 def p_while_loop(p):
+	'''statement : WHILE LPAREN expression RPAREN LBRACE statement_list RBRACE
     '''
-    statement : WHILE LPAREN expression RPAREN LBRACE statement_list RBRACE
-    '''
-    p[0] = ast.While(p[2], p[4])
-
+	print("while")
 	
+
+def p_return(p):
+    '''
+    statement : RETURN expression 
+    '''
+    print(f"return p[2]")
+
+
+
 def p_for_loop(p):	
     '''
-    statement : FOR expression IN expression  expression LBRACE statement_list RBRACE
+    statement : FOR LPAREN expression IN expression  expression RPAREN LBRACE statement_list RBRACE
               '''
-    p[0] = ast.For(p[2], p[4], p[6], p[5] == '->', p[8])
+    print("for")
 	
 def p_conditional_and(p):
     '''statement : expression L expression AND expression L expression
@@ -349,15 +364,11 @@ def p_conditional_or(p):
     else:
     	p[0]=False
     print(p[0])
-def p_function_def(p):
-    'statement : FUNCTION expression LPAREN expression RPAREN LBRACE statement RBRACE'
-    print("function def")
+
 def p_class_def(p):
     'statement : CLASS expression LPAREN expression RPAREN LBRACE statement RBRACE'
     print("class def")
-def p_build_def(p):
-    'statement : BUILD expression LPAREN expression RPAREN LBRACE statement RBRACE'
-    print("build def")
+
 def p_statement_expr(p):
     'statement : expression'
     if p[1] != None:
@@ -398,6 +409,7 @@ def p_expression_binop(p):
                   | expression '^' expression
                   | expression '%' expression
 				  '''
+	
     if p[2] == '+':
         p[0] = p[1] + p[3]
     elif p[2] == '-':
@@ -443,13 +455,7 @@ def p_expression_name(p):
     try:
         p[0] = names[p[1]]
     except LookupError:
-        p[0] = f'undefined variable {p[1]} not found'
-def p_expression_class(p):
-    "expression : expression LPAREN expression RPAREN"
-    try:
-        p[0] = classes[p[1]+p[2]+p[3]+p[4]]
-    except LookupError:
-        p[0] = f'undefined class {p[1]} not found'
+        p[0] = (f'undefined variable {p[1]} not found')
 
 
 def p_error(p):
